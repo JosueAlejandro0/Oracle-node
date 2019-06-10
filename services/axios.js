@@ -1,14 +1,20 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; 
 const axios = require('axios');
+const servicio =require('../controllers/services');
 var json={};
 async function get(req, res, next) {
     try {
       console.log(req.params)
-     axios.get(`http://cayas-ags-cayas.openshift.cpnlab/ws-cayas/rest/${req.params.uri}`).then(async response => {
+if(req.params.uri === "empleado"){
+  var http = `http://99.90.28.137:8080/ws-cayas/rest/${req.params.uri}`;
+}else{
+  var http = `http://99.90.28.137:8080/ws-cayas-${req.params.uri}/rest/${req.params.uri}`;
+}
+     axios.get(http).then(async response => {
 
               switch(req.params.uri){
                 case 'empleado':
-                    if(req.params.id === 'send'){
+                    if(req.params.string === 'send'){
                      json={
                         url: 'employees',
                         service:'EMPLEADO',
@@ -33,7 +39,7 @@ async function get(req, res, next) {
                       url: 'jobs',
                       service:'JOBCODE',
                       data: response.data}
-                    await post(json);
+                   await post(json);
                     }
                   
                 break;
@@ -90,6 +96,7 @@ module.exports.get = get;
 
 async function post(req, next) {
   try {
+    console.log(req);
     var data=req.data;
       axios({ 
         method: 'POST',
@@ -108,10 +115,37 @@ async function post(req, next) {
         data:data      
               }
             ).then(response => {
-            console.log('hola')
-            console.log(data)
-            console.log(response.data.details);
- 
+          if(response.data===undefined||response.data===null){
+            json={
+              success:undefined
+            }
+            servicio.postRES(json);
+          } 
+
+           if(req.service==="EMPLEADO"){
+            response.data.empleados.forEach(function (element) {            
+              json={
+                servicio:req.service,
+                success:element.success,
+                data:Object.values(element)[1],
+                error:element
+              }         
+             servicio.postRES(json);
+            });  
+           }else{
+            response.data.details.forEach(function (element) {
+              json={
+                servicio:req.service,
+                success:element.success,
+                data:Object.values(element)[1],
+                error:element
+              }
+             servicio.postRES(json);
+            });
+          }
+
+
+
       }).catch(function (error) {
           if (error.response) {
             //The request was made and the server responded with a status code

@@ -1,27 +1,41 @@
-const servicios = require('../db_api/empleados.js');
+const servicios = require('../db_api/services');
 function ObtenerRES(req) {
-
-  const empleado = {
-      SERVICIO: req.SERVICIO,
-      ID_SERVICIO: req.ID_SERVICIO,
-      SUCCESS_INFO: req.success,
-      CODE: req.error.code,
-      MESSAGE: req.error.message
+  var servicio={};
+  
+  if(req.success===true){
+     servicio = {
+      SERVICIO: req.servicio,
+      ID_SERVICIO: req.data,
+      SUCCESS_INFO: "true",
+      CODE: "null",
+      MESSAGE: "null"
     };
+  }else if(req.success===false){
+    servicio = {
+      SERVICIO: req.servicio,
+      ID_SERVICIO: "null",
+      SUCCESS_INFO: "false",
+      CODE: req.error.error.code,
+      MESSAGE: req.error.error.message
+    };
+  }else{
+    servicio={
+      SERVICIO: "ERROR",
+      ID_SERVICIO: "",
+      SUCCESS_INFO: "false",
+      CODE: "",
+      MESSAGE: "Error inesperado"
+    }
+  }
       
-      return empleado;
+      return servicio;
     }
     
     async function postRES(req, res, next) {
       try {
-      if(req.success===true){
-        req.success='true';
-      }else if(req.success===false){
-        req.success='false';
-      }  
-    
+     
       let MessageRES = ObtenerRES(req);
-     // MessageRES = await servicios.CreateRES(MessageRES);
+      MessageRES = await servicios.CreateRES(MessageRES);
       } catch (err) {
         console.log(err);
       }

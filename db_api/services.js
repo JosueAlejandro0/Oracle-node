@@ -1,4 +1,4 @@
-const database = require('../servicio/database.js');
+const database = require('../services/database.js');
 const CreateSqlRES =
 `BEGIN GuardarRegistrosRESEMP (
   :SERVICIO,
