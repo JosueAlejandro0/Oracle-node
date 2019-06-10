@@ -17,9 +17,6 @@ function simpleExecute(statement, binds = [], opts = {}) {
       opts.autoCommit = true; 
       try {
         conn = await oracledb.getConnection();   
-        console.log(statement);
-        console.log(binds);
-        console.log(opts);
         const result = await conn.execute(statement, binds, opts);
         resolve(result);
       } catch (err) {

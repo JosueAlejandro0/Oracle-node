@@ -4,7 +4,6 @@ const servicio =require('../controllers/services');
 var json={};
 async function get(req, res, next) {
     try {
-      console.log(req.params)
 if(req.params.uri === "empleado"){
   var http = `http://99.90.28.137:8080/ws-cayas/rest/${req.params.uri}`;
 }else{
@@ -96,7 +95,6 @@ module.exports.get = get;
 
 async function post(req, next) {
   try {
-    console.log(req);
     var data=req.data;
       axios({ 
         method: 'POST',
@@ -122,29 +120,16 @@ async function post(req, next) {
             servicio.postRES(json);
           } 
 
-           if(req.service==="EMPLEADO"){
-            response.data.empleados.forEach(function (element) {            
-              json={
-                servicio:req.service,
-                success:element.success,
-                data:Object.values(element)[1],
-                error:element
-              }         
-             servicio.postRES(json);
-            });  
-           }else{
-            response.data.details.forEach(function (element) {
-              json={
-                servicio:req.service,
-                success:element.success,
-                data:Object.values(element)[1],
-                error:element
-              }
-             servicio.postRES(json);
-            });
-          }
-
-
+          (Object.values(response.data)[1]).forEach(function (element) {            
+            json={
+              servicio:req.service,
+              success:element.success,
+              data:Object.values(element)[1],
+              error:element
+            }      
+           servicio.postRES(json);
+          });  
+            
 
       }).catch(function (error) {
           if (error.response) {
